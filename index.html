@@ -941,6 +941,30 @@ html[data-design='friendly'] .promotion-card{border-radius:22px;box-shadow:var(-
 }
 .hub-card-fallback:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 
+/* Demonstration destination is deliberately outside the verified-channel grid. */
+.hub-demo-map {
+  display: grid; grid-template-columns: 48px minmax(0, 1fr); align-items: start;
+  gap: 18px; margin: 28px 0 32px; padding: clamp(20px, 3vw, 30px);
+  border: 1px dashed var(--pine); border-radius: 16px; background: var(--sage);
+  color: var(--ink);
+}
+.hub-demo-map-icon {
+  width: 48px; height: 48px; display: grid; place-items: center;
+  border-radius: 12px; background: var(--white); color: var(--pine-deep);
+}
+.hub-demo-map-icon svg { width: 25px; height: 25px; }
+.hub-demo-map-copy { min-width: 0; }
+.hub-demo-label { display: block; margin-bottom: 7px; color: var(--pine-deep); font-size: 12px; font-weight: 750; }
+.hub-demo-map h3 { margin: 0 0 9px; font-size: clamp(18px, 2vw, 23px); }
+.hub-demo-map p { margin: 0 0 14px; line-height: 1.7; font-size: 13px; overflow-wrap: anywhere; }
+.hub-demo-map a {
+  display: inline-flex; align-items: center; min-height: 44px; gap: 8px;
+  color: var(--pine-deep); font-size: 13px; font-weight: 700;
+  text-decoration: underline; text-underline-offset: 4px;
+}
+.hub-demo-map a:focus-visible { outline: 3px solid var(--pine-deep); outline-offset: 3px; }
+@media (max-width: 520px) { .hub-demo-map { grid-template-columns: 1fr; } }
+
 /* ------------------------------------------------------------------ *
  * 4. Hub ribbon — quiet full-bleed strip under the hub               *
  * ------------------------------------------------------------------ */
@@ -1714,7 +1738,7 @@ const CHANNELS = [
   { id: 'google', label: 'Google' },
 ];
 const HOSTS = {
-  map: new Set(['map.kakao.com', 'maps.kakao.com', 'place.map.kakao.com', 'google.com', 'www.google.com', 'maps.google.com', 'maps.app.goo.gl']),
+  map: new Set(['map.naver.com', 'naver.me', 'map.kakao.com', 'maps.kakao.com', 'place.map.kakao.com', 'google.com', 'www.google.com', 'maps.google.com', 'maps.app.goo.gl']),
   kakao: new Set(['pf.kakao.com', 'pf.kakao.com']),
   instagram: new Set(['instagram.com', 'www.instagram.com']),
   google: new Set(['google.com', 'www.google.com', 'maps.google.com', 'maps.app.goo.gl', 'g.page']),
@@ -1729,7 +1753,9 @@ function isOfficialUrl(id, value) {
   const hostname = parsed.hostname.toLowerCase().replace(/\.$/, '');
   if (!HOSTS[id]?.has(hostname)) return false;
   if (id === 'map') {
-    return (hostname.endsWith('kakao.com') && (parsed.pathname !== '/' || parsed.search !== '')) ||
+    return (hostname === 'map.naver.com' && /^\/p\/entry\/place\/[0-9]+\/?$/.test(parsed.pathname)) ||
+      (hostname === 'naver.me' && /^\/[A-Za-z0-9_-]{5,32}$/.test(parsed.pathname)) ||
+      (hostname.endsWith('kakao.com') && (parsed.pathname !== '/' || parsed.search !== '')) ||
       (hostname === 'maps.app.goo.gl' && parsed.pathname.length > 1) ||
       ((hostname === 'google.com' || hostname === 'www.google.com' || hostname === 'maps.google.com') && (parsed.pathname.startsWith('/maps') || parsed.pathname.startsWith('/?')));
   }
@@ -1779,6 +1805,37 @@ function resolveClinicChannels(raw) {
 const empty=()=>({phone:{verified:false,number:null},map:{verified:false,url:null},kakao:{verified:false,url:null},instagram:{verified:false,url:null},google:{verified:false,url:null}});
 const marketingChannels={internal:empty(),dental:empty(),korean:empty()};
 
+/* Inline glyphs from lucide-static v0.468.0. Original SVGs and full text are
+ * preserved in site/assets/channel-icons/. These are generic symbols, not
+ * platform logos. The ISC notice is retained in every bundled HTML copy:
+ *
+ * ISC License
+ * Copyright (c) for portions of Lucide are held by Cole Bemis 2013-2022
+ * as part of Feather (MIT). All other copyright (c) for Lucide are held by
+ * Lucide Contributors 2022.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+const glyphs = Object.freeze({
+  phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
+  map: '<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  kakao: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  instagram: '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>',
+  google: '<circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/>',
+});
+/** Decorative SVG only: nearby text names each service for assistive technology. */
+function channelIcon(id) {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${glyphs[id] || glyphs.map}</svg>`;
+}
+
 const routes = {home:'홈',about:'병원 소개',care:'진료 안내',team:'의료진',facilities:'장비·활동',fees:'비급여 안내',news:'새봄 소식',visit:'오시는 길',connect:'채널 허브',privacy:'개인정보 안내'};
 const clinic = {name:'새봄의원',notice:'10월 3일 진료 일정 안내',hours:'평일 10:00–17:00',fee:12000,date:'2026.09.25',synthetic:true};
 const fees = [
@@ -1814,7 +1871,8 @@ function renderApp(route='home',options={}){
  const careCards=()=>careItems.map((c,i)=>`<a class="care-card" href="${href('care','care-'+c.id)}" data-route="care" data-anchor="care-${c.id}"><span class="care-number">0${i+1}</span><span class="care-icon">${icon(c.icon)}</span><h3>${c.title}</h3><p>${c.short}</p><span class="arrow">↗</span></a>`).join('');
  const hours=()=>`<dl class="hours-table"><div><dt>평일</dt><dd data-bind="hours">${clinic.hours.replace(/^평일\s*/, '')}</dd></div><div><dt>토요일</dt><dd>${scenario.id==='internal'?'10:00–13:00':'운영 여부 개별 문의'}</dd></div><div><dt>점심시간</dt><dd>운영기관에 개별 문의</dd></div><div><dt>일요일·공휴일</dt><dd>휴진</dd></div></dl><p class="legal-note">가상 진료시간입니다. 실제 운영 일정이 아닙니다.</p>`;
  const faq=()=>`<div class="faq-list"><details><summary>이 홈페이지에서 실제 예약을 할 수 있나요?</summary><p>가상 병원 홍보 홈페이지이므로 실제 진료 예약이나 개인정보를 접수하지 않습니다. 예약 버튼은 이용 흐름을 보여주는 안내창을 엽니다.</p></details><details><summary>${scenario.faq[0]}</summary><p>${scenario.faq[1]} 현재 안내는 가상 예시이며 의료 조언이 아닙니다.</p></details><details><summary>진료비는 어디에서 확인하나요?</summary><p>비급여 안내 페이지에서 항목 검색과 분류별 조회를 할 수 있습니다. 여기에 표시된 항목과 금액은 실제 의료기관의 진료비가 아닙니다.</p>${link('fees','비급여 안내 보기 ↗','text-link')}</details></div>`;
- const channelCards=()=>channels.map((c,i)=>{const ready=c.state==='available'&&c.href;const copy={phone:'전화 앱에서 직접 문의할 수 있습니다.',map:'확인된 지도에서 길찾기를 이어갑니다.',kakao:'공식 카카오톡 채널에서 소식을 확인합니다.',instagram:'공식 인스타그램 콘텐츠를 살펴봅니다.',google:'Google의 공식 비즈니스 정보로 이동합니다.'};return `<article class="hub-card ${ready?'is-ready':'is-unavailable'}" data-channel="${esc(c.id)}"><div class="hub-card-top"><span class="hub-card-icon" aria-hidden="true">${({phone:'01',map:'02',kakao:'03',instagram:'04',google:'05'})[c.id]}</span><span class="hub-card-state">${ready?'연결됨':'확인 전'}</span></div><h3>${esc(c.label)}</h3><p>${ready?copy[c.id]:c.reason==='invalid_or_unofficial'?'공식 주소를 다시 확인하고 있습니다.':'공식 채널을 확인한 뒤 연결합니다.'}</p>${ready?`<a class="hub-card-link" href="${esc(c.href)}"${c.id==='phone'?'':' target="_blank" rel="noopener noreferrer"'} aria-label="${esc(c.label)} 공식 채널 열기">채널 열기 <span aria-hidden="true">↗</span></a>`:`<div class="hub-card-fallback"><span>연결 준비 중</span>${link('visit','방문 정보 보기 ↗','text-link')}</div>`}</article>`;}).join('');
+ const channelCards=()=>channels.map((c,i)=>{const ready=c.state==='available'&&c.href;const copy={phone:'전화 앱에서 직접 문의할 수 있습니다.',map:'확인된 지도에서 길찾기를 이어갑니다.',kakao:'공식 카카오톡 채널에서 소식을 확인합니다.',instagram:'공식 인스타그램 콘텐츠를 살펴봅니다.',google:'Google의 공식 비즈니스 정보로 이동합니다.'};return `<article class="hub-card ${ready?'is-ready':'is-unavailable'}" data-channel="${esc(c.id)}"><div class="hub-card-top"><span class="hub-card-icon" aria-hidden="true">${channelIcon(c.id)}</span><span class="hub-card-state">${ready?'연결됨':'확인 전'}</span></div><h3>${esc(c.label)}</h3><p>${ready?copy[c.id]:c.reason==='invalid_or_unofficial'?'공식 주소를 다시 확인하고 있습니다.':'공식 채널을 확인한 뒤 연결합니다.'}</p>${ready?`<a class="hub-card-link" href="${esc(c.href)}"${c.id==='phone'?'':' target="_blank" rel="noopener noreferrer"'} aria-label="${esc(c.label)} 공식 채널 열기">채널 열기 <span aria-hidden="true">↗</span></a>`:`<div class="hub-card-fallback"><span>연결 준비 중</span>${link('visit','방문 정보 보기 ↗','text-link')}</div>`}</article>`;}).join('');
+ const naverDemoPanel=()=>`<aside class="hub-demo-map" data-demo-link="naver-map" aria-labelledby="demo-map-heading"><span class="hub-demo-map-icon" aria-hidden="true">${channelIcon('map')}</span><div class="hub-demo-map-copy"><span class="hub-demo-label">작동 예시 · 실제 의원 위치 아님</span><h3 id="demo-map-heading">네이버 지도 링크 시연</h3><p><strong>서울특별시청</strong> · 서울 중구 세종대로 110. 이곳은 지도 링크 동작을 확인하기 위한 공공장소이며 ${siteName}을 포함한 어떤 가상 의원의 주소도 아닙니다.</p><a href="https://naver.me/5ZJx0A7r" target="_blank" rel="noopener noreferrer" aria-label="네이버 지도에서 서울특별시청 예시 장소 열기, 가상 의원 위치 아님">서울특별시청 지도 예시 열기 <span aria-hidden="true">↗</span></a></div></aside>`;
  const callAction=(text='전화 안내 확인',cls='outline')=>channel('phone')?.state==='available'?`<a class="btn ${cls}" href="${esc(channel('phone').href)}">${text} ↗</a>`:btn('call',text,cls);
  const mapAction=(text='길찾기',cls='primary')=>channel('map')?.state==='available'?`<a class="btn ${cls}" href="${esc(channel('map').href)}" target="_blank" rel="noopener noreferrer">${text} ↗</a>`:link('connect',text+' 안내 ↗','btn '+cls);
  const newsRows=()=>news.map((n,i)=>`<button class="notice-row" data-notice="${n.id}"><span class="notice-category">${n.category}</span><span class="notice-title"${i===0?' data-bind="notice"':''}>${esc(n.title)}</span><span class="notice-date">${n.date}</span><span class="arrow">↗</span></button>`).join('');
@@ -1831,9 +1889,9 @@ function renderApp(route='home',options={}){
  if(current==='team') body=head('OUR PEOPLE','사람과 사람으로<br>마주하는 진료.','실제 운영 시 확인된 이름·자격·약력과 사용 허가를 받은 사진으로 소개합니다.')+`<section class="container doctor-grid"><article class="doctor-card">${portrait(scenario.doctor,portraitSrc)}<div class="profile-copy"><p class="eyebrow">가상 의료진 프로필</p><h2>${scenario.doctor}</h2><p class="lead">“방문 안내와 확인사항을<br>차근차근 살펴보세요.”</p><dl><dt>소개 역할</dt><dd>${scenario.profession}</dd><dt>프로필</dt><dd>AI 합성 가상 인물</dd></dl><p class="legal-note">AI 합성 가상 인물 · 실제 의료진이 아닙니다. 실명·자격·학력·경력을 기재하지 않았습니다.</p>${link('care','진료 안내 살펴보기 ↗','text-link')}</div></article></section>`;
  if(current==='fees') body=head('CLEAR INFORMATION','비용도,<br>알기 쉽게 안내합니다.','항목을 검색하거나 분류별로 확인하세요. 모든 항목과 금액은 가상 예시입니다.')+`<section class="container"><div class="legal-note fee-warning"><strong>실제 진료비가 아닙니다.</strong> 실제 운영 시 고지 대상·항목·단위·범위·최종 확인일을 의료기관의 승인 자료로 교체합니다. 예시 작성일 ${clinic.date}</div><div class="filter-bar"><label class="sr-only" for="fee-search">비급여 항목 검색</label><input class="search-input" id="fee-search" type="search" placeholder="항목 이름을 검색하세요" autocomplete="off"><div class="filter-options" role="group" aria-label="비급여 분류">${['전체',...new Set(fees.map(f=>f.category))].map((c,i)=>`<button class="filter-button${i===0?' active':''}" data-fee-category="${c}" aria-pressed="${i===0}">${c}</button>`).join('')}</div></div><p class="inline-status" id="fee-count" role="status">총 6개 항목</p><div class="table-wrap" tabindex="0" role="region" aria-label="비급여 예시 가격표. 작은 화면에서는 좌우로 이동할 수 있습니다."><table class="fees-table"><caption class="sr-only">실제 진료비가 아닌 가상 비급여 항목과 예시 금액</caption><thead><tr><th scope="col">분류</th><th scope="col">항목</th><th scope="col">단위</th><th scope="col">예시 금액</th><th scope="col">안내</th></tr></thead><tbody>${fees.map(f=>`<tr data-fee-row data-category="${f.category}" data-name="${f.name}"><td>${f.category}</td><th scope="row">${f.name}</th><td>${f.unit}</td><td${f.id==='consult'?' data-bind="fee"':''}>${f.price.toLocaleString('ko-KR')}원</td><td>${f.note}</td></tr>`).join('')}</tbody></table></div><div class="empty-state" id="fee-empty" hidden><h2>검색 결과가 없습니다.</h2><p>다른 검색어나 분류로 다시 확인해 주세요.</p><button class="btn outline" data-action="reset-fees">검색 초기화</button></div></section><section class="section container two-column"><div><p class="eyebrow">GOOD TO KNOW</p><h2 class="display">미리 확인하면<br>더 편안합니다.</h2></div><div class="prose"><h3>최종 비용은 확인 후 안내합니다.</h3><p>실제 운영에서는 항목의 포함 범위, 추가 비용 가능 여부, 환자별 차이 등을 확인된 기준에 따라 안내해야 합니다.</p><h3>서류 발급 전 필요한 절차를 확인하세요.</h3><p>발급 가능 서류와 본인 확인 요건, 수수료는 실제 의료기관에 확인하는 정보입니다.</p></div></section>`;
  if(current==='news') body=head(`${scenario.label.toUpperCase()} JOURNAL`,`${scenario.name}의 소식과<br>방문에 필요한 이야기.`,'진료 일정과 이용 안내를 한곳에서 확인하세요.')+`<section class="container"><div class="filter-bar" role="group" aria-label="소식 분류">${['전체',...new Set(news.map(n=>n.category))].map((c,i)=>`<button class="filter-button${i===0?' active':''}" data-news-category="${c}" aria-pressed="${i===0}">${c}</button>`).join('')}</div><div class="notice-list" id="news-list">${newsRows()}</div><p class="legal-note">가상 브랜드를 위한 예시 소식입니다. 실제 진료 일정이 아닙니다.</p></section><section class="section container two-column"><div><p class="eyebrow">FREQUENTLY ASKED</p><h2 class="display">자주 묻는 질문.</h2></div>${faq()}</section>`;
- if(current==='visit') body=head('FIND YOUR WAY','찾아오는 길도,<br>편안하게.','진료시간과 위치, 교통 정보를 방문 전에 확인하세요.')+`<section class="container two-column"><div class="visit-card"><div class="visit-map">${mapArt(siteName)}</div><div class="profile-copy"><span class="pill">가상 약도</span><h2>${siteName} 위치 안내</h2><p>실제 의료기관 주소 등록 전</p><p class="legal-note">위 그림은 실제 지도가 아닙니다. 주소나 좌표를 임의로 만들지 않았습니다.</p><div class="contact-options">${mapAction('길찾기','primary')}${btn('address','주소 확인','outline')}</div></div></div><div><p class="eyebrow">OPENING HOURS</p><h2>진료시간 안내</h2>${hours()}<div class="notice-strip"><span class="notice-label">NOTICE</span><span data-bind="notice">${clinic.notice}</span></div>${callAction('전화 문의 안내','outline')}</div></section><section class="section container transport-grid"><article class="transport-card"><span class="care-icon">${icon('pin')}</span><h3>대중교통</h3><p>실제 주소를 확정한 뒤 가까운 역·출구와 버스 정류장 정보를 안내합니다.</p><small>데모에서는 특정 역이나 노선을 지정하지 않습니다.</small></article><article class="transport-card"><span class="care-icon">${icon('shield')}</span><h3>주차 안내</h3><p>주차 가능 여부, 이용 시간과 지원 조건을 확인해 안내하는 영역입니다.</p><small>무료 주차나 편의시설을 임의로 보장하지 않습니다.</small></article><article class="transport-card"><span class="care-icon">${icon('clock')}</span><h3>방문 전 확인</h3><p>확정된 진료시간과 접수 안내, 방문 전 준비사항을 확인해 주세요.</p><small>현재 모든 운영 정보는 가상 예시입니다.</small></article></section>`;
+ if(current==='visit') body=head('FIND YOUR WAY','찾아오는 길도,<br>편안하게.','진료시간과 위치, 교통 정보를 방문 전에 확인하세요.')+`<section class="container two-column"><div class="visit-card"><div class="visit-map">${mapArt(siteName)}</div><div class="profile-copy"><span class="pill">가상 약도</span><h2>${siteName} 위치 안내</h2><p>실제 의료기관 주소 등록 전</p><p class="legal-note">위 그림은 실제 지도가 아닙니다. 주소나 좌표를 임의로 만들지 않았습니다.</p><div class="contact-options">${mapAction('길찾기','primary')}${btn('address','주소 확인','outline')}</div></div></div><div><p class="eyebrow">OPENING HOURS</p><h2>진료시간 안내</h2>${hours()}<div class="notice-strip"><span class="notice-label">NOTICE</span><span data-bind="notice">${clinic.notice}</span></div>${callAction('전화 문의 안내','outline')}</div></section><section class="section container transport-grid"><article class="transport-card"><span class="care-icon">${icon('pin')}</span><h3>대중교통</h3><p>실제 주소를 확정한 뒤 가까운 역·출구와 버스 정류장 정보를 안내합니다.</p><small>데모에서는 특정 역이나 노선을 지정하지 않습니다.</small></article><article class="transport-card"><span class="care-icon">${icon('shield')}</span><h3>주차 안내</h3><p>주차 가능 여부, 이용 시간과 지원 조건을 확인해 안내하는 영역입니다.</p><small>무료 주차나 편의시설을 임의로 보장하지 않습니다.</small></article><article class="transport-card"><span class="care-icon">${icon('clock')}</span><h3>방문 전 확인</h3><p>확정된 진료시간과 접수 안내, 방문 전 준비사항을 확인해 주세요.</p><small>현재 모든 운영 정보는 가상 예시입니다.</small></article></section><section class="container">${naverDemoPanel()}</section>`;
  if(current==='home')body+=`<section class="hub-ribbon"><div class="container hub-ribbon-inner"><div><p class="hub-kicker">CONNECTED, WITH CARE</p><h2>하나의 안내에서,<br>필요한 길로.</h2><p>전화와 지도, 소셜 채널을 따로 헤매지 않도록. 확인된 공식 채널만 이곳에서 연결합니다.</p></div>${link('connect','채널 허브 살펴보기 ↗','btn light')}</div></section><section class="hub-editorial hub-preview container"><div class="hub-intro"><p class="hub-kicker">THE CONNECTION DESK / 01</p><h2 class="hub-heading">방문의 모든 접점을<br><em>한곳에 모읍니다.</em></h2><p>지금은 가상 시안입니다. 연결 전 채널은 준비 중으로 표시하고, 방문 안내로 이어집니다.</p></div><div class="hub-grid">${channelCards()}</div></section>`;
- if(current==='connect') body=head('THE CONNECTION DESK','찾아오는 모든 길을,<br>한곳에서.','홈페이지와 공식 채널을 연결하는 방문 안내 허브입니다. 확인된 채널만 외부 서비스로 이동합니다.')+`<section class="hub-editorial container"><div class="hub-intro"><p class="hub-kicker">ONE PLACE. EVERY TOUCHPOINT.</p><h2 class="hub-heading">필요할 때, <em>바로 이어지도록.</em></h2><p>전화·지도·카카오톡·인스타그램·Google 채널을 기관이 확인한 정보로만 연결합니다. 준비되지 않은 채널에는 대체 경로를 제공합니다.</p></div><div class="hub-grid">${channelCards()}</div><div class="hub-note"><strong>안전한 연결 원칙</strong><p>공식 소유권·주소·전화번호를 확인하지 않은 채널은 활성화하지 않습니다. 이 데모에서는 실제 병원 계정, 위치, 전화번호나 환자정보를 사용하지 않습니다.</p></div></section><section class="hub-ribbon"><div class="container hub-ribbon-inner"><div><p class="hub-kicker">BEFORE YOU VISIT</p><h2>방문 정보를 먼저<br>확인해 주세요.</h2><p>진료시간과 위치는 실제 기관의 검토를 거친 뒤 게시합니다.</p></div>${link('visit','방문 안내 보기 ↗','btn light')}</div></section>`;
+ if(current==='connect') body=head('THE CONNECTION DESK','찾아오는 모든 길을,<br>한곳에서.','홈페이지와 공식 채널을 연결하는 방문 안내 허브입니다. 확인된 채널만 외부 서비스로 이동합니다.')+`<section class="hub-editorial container"><div class="hub-intro"><p class="hub-kicker">ONE PLACE. EVERY TOUCHPOINT.</p><h2 class="hub-heading">필요할 때, <em>바로 이어지도록.</em></h2><p>전화·지도·카카오톡·인스타그램·Google 채널을 기관이 확인한 정보로만 연결합니다. 준비되지 않은 채널에는 대체 경로를 제공합니다.</p></div><div class="hub-grid">${channelCards()}</div>${naverDemoPanel()}<div class="hub-note"><strong>안전한 연결 원칙</strong><p>공식 소유권·주소·전화번호를 확인하지 않은 채널은 활성화하지 않습니다. 이 데모에서는 실제 병원 계정, 위치, 전화번호나 환자정보를 사용하지 않습니다.</p></div></section><section class="hub-ribbon"><div class="container hub-ribbon-inner"><div><p class="hub-kicker">BEFORE YOU VISIT</p><h2>방문 정보를 먼저<br>확인해 주세요.</h2><p>진료시간과 위치는 실제 기관의 검토를 거친 뒤 게시합니다.</p></div>${link('visit','방문 안내 보기 ↗','btn light')}</div></section>`;
  if(current==='privacy') body=head('PRIVACY & DEMO NOTICE','개인정보와<br>가상 홈페이지 안내.','입력은 받지 않고, 실제 기관으로 오인되지 않도록 안내합니다.')+`<section class="container prose privacy-section"><h2>1. 이 홈페이지의 성격</h2><p>${siteName}은 ${scenario.label} 방문 안내 화면을 위한 가상 브랜드입니다. 실제 진료·예약·상담 서비스를 제공하지 않습니다. 의료진 자격, 진료 실적, 치료 효과를 주장하지 않습니다.</p><h2>2. 개인정보를 입력받지 않습니다</h2><p>회원가입, 문의 접수, 예약 신청, 문진, 결제 기능이 없습니다. 이름·연락처·증상·진료기록을 입력하는 양식을 두지 않았습니다. 검색어는 화면 안에서만 처리하며 서버로 전송하지 않습니다. 디자인·가상 의원 선택값만 이 브라우저의 로컬 저장소에 보관할 수 있으며, 저장소 접근이 제한되면 현재 화면에서만 적용합니다.</p><h2>3. 외부 연결과 플랫폼 로그</h2><p>확인되지 않은 전화·지도·소셜 채널은 외부로 연결하지 않고 안내창 또는 내부 방문 정보로 이동합니다. 공식 채널을 연결하면 해당 플랫폼의 개인정보·기술 로그 정책이 적용됩니다. 이 데모는 실제 번호나 외부 예약 서비스로 연결하지 않습니다. 자체 광고 픽셀이나 분석 도구를 사용하지 않습니다. Google Apps Script 버전은 소유자 계정으로 접근하며, Google의 인증·기술 로그는 해당 플랫폼 정책의 적용을 받습니다.</p><h2>4. 이미지와 프로필</h2><p>공간 이미지는 AI로 제작한 가상의 디자인 콘셉트입니다. 의료진 이미지는 AI 합성 가상 인물 사진이며 실제 의료진이 아닙니다. 타 병원 사진·원고·실제 의료진 약력을 복제하지 않았습니다.</p><h2>5. 실제 운영 전 필요한 확인</h2><p>기관명, 개설 정보, 의료진 자격, 진료 범위, 주소·전화, 비용, 이미지 사용권, 개인정보 처리방침과 의료광고 관련 검토가 필요합니다. 가상 정보 그대로 실제 기관의 홍보에 사용해서는 안 됩니다.</p><p class="legal-note">작성일 ${clinic.date} · 가상 홍보 홈페이지 안내</p></section>`;
 
  if(current==='care')body+=`<section class="section container care-story"><figure><img src="${careImage}" width="1200" height="800" loading="lazy" alt="${scenario.label} 상담 분위기를 표현한 AI 합성 가상 장면"><figcaption>AI 합성 설명용 이미지 · 실제 의료진·환자·진료 장면이 아닙니다.</figcaption></figure><div><p class="eyebrow">BEFORE WE MEET</p><h2>방문 전 준비를<br>차근차근.</h2><p class="lead">${scenario.firstVisit}</p><p>개인 상태에 관한 판단이나 치료 결과를 온라인 이미지로 약속하지 않습니다.</p>${link('visit','방문 안내 살펴보기 ↗','text-link')}</div></section>`;
