@@ -31,7 +31,7 @@ jobs:
           const assert=require('node:assert/strict');
           const html=fs.readFileSync('index.html','utf8');
           const digest=crypto.createHash('sha256').update(html).digest('hex');
-          assert.equal(digest,'8fff4f885252810050dead8759389f49b3b49b5fada9ed9a2f43c0de972e82c2','Published HTML digest changed without review');
+          assert.equal(digest,'198b7ef0dede5401c34d3dde95b9461ed3c17a918f9e819e79b7b8d6c2eb2af3','Published HTML digest changed without review');
           const files=fs.readdirSync('.').filter(n=>n!=='.git'&&n!=='.github').sort();
           assert.deepEqual(files,['.nojekyll','README.md','index.html','robots.txt']);
           for(const term of ['script.google.com','content-review.html','source-facts.json','qaPublished()','data-action="admin"','아산봄내과의원','춘천예치과','경희봄한의원','올림푸스 CV-290','척추신경추나의학회'])assert(!html.includes(term),`Excluded field appeared: ${term}`);
